@@ -11,7 +11,17 @@ Following datasets are necessary to run the code and are included in the data fo
 
 
 ## Rcode
-The main code covariate_varying_DLNM_Italy.R contains the Rcode of the data application. // Moreover, the folder **simulations** includes the Rcode that can be used to recover the simulation results. This folder contains several files:
+The main code covariate_varying_DLNM_Italy.R contains the Rcode of the data application.   
+Moreover, the folder **simulations** includes the Rcode that can be used to recover the simulation results. This folder contains several files:
+| File | Description |
+| --- | --- | 
+| Linear_small_area.R | Simulation code for linear effect modification in small areas |
+| Linear_large_area.R | Simulation code for linear effect modification in large areas |
+| Smooth_small_area.R | Simulation code for smooth effect modification in small areas |
+| Smooth_large_area.R | Simulation code for smooth effect modification in large areas |
+| Additional Simulations | Similar code to obtain the results for the negative binomial simulations (Supplementary Materials) |
+
+The folder **functions** include the Rcode that is needed to fit the effect modified DLNM model. The folder contains the following files:
 | File | Description |
 | --- | --- | 
 | DLNM_Laplace_covariate.R | Function to fit the DLNM model with effect modification |
