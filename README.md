@@ -11,7 +11,7 @@ Following datasets are necessary to run the code and are included in the data fo
 
 
 ## Rcode
-The main code covariate_varying_DLNM_Italy contains the Rcode of the data application. Moreover, the folder **simulations** includes the Rcode that can be used to recover the simulation results. This folder contains several files:
+The main code covariate_varying_DLNM_Italy.R contains the Rcode of the data application. Moreover, the folder **simulations** includes the Rcode that can be used to recover the simulation results. This folder contains several files:
 | File | Description |
 | --- | --- | 
 
