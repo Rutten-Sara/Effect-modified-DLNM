@@ -10,22 +10,20 @@ library(dlnm)
 library(tsModel); library(gnm)
 library(R.utils);library(mixmeta); library(splines)
 
-setwd("G:/My Drive/Onderzoek/DLNM/Spatial varying DLNM/Code/Covariate varying")
-
-source('functions/DLNM_Laplace_covariate.R')
-source('functions/DLNM_Laplace_covariate_NB.R')
-source('functions/DLNM_Laplace_covariate_poisson.R')
-source('functions/predRR_covariate.R')
-source('functions/help_functions.R')
-source('functions/BAM_predict.R')
-source('functions/interpret_coefficients.R')
+source('../functions/DLNM_Laplace_covariate.R')
+source('../functions/DLNM_Laplace_covariate_NB.R')
+source('../functions/DLNM_Laplace_covariate_poisson.R')
+source('../functions/predRR_covariate.R')
+source('../functions/help_functions.R')
+source('../functions/BAM_predict.R')
+source('../functions/interpret_coefficients.R')
 
 
 
 # Load data
 
-load("data/daily_data.RData")
-shapefile_bcn <- read_sf("data/shapefile_bcn.shp")
+load("../data/daily_data.RData")
+shapefile_bcn <- read_sf("../data/shapefile_bcn.shp")
 data$year <- year(data$date)
 
 
@@ -913,3 +911,4 @@ for (i in 1:nsim){
   
   
   
+
