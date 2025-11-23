@@ -1,4 +1,4 @@
-# Effect-modified-DLNM
+# Distributed lag non-linear models with effect modification using Laplacian P-splines
 Sara Rutten, Thomas Neyens, Elisa Duarte and Christel Faes
 
 ## About this repository
