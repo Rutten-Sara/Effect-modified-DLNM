@@ -5,7 +5,7 @@
 # - Otherwise: calculate the RRR for an increase of 1 unit in the effect modifier
 ################################################################################
 #   - model: result from DLNM_Laplace_cov
-#   - at_x: vector of exposure values to predict in
+#   - at_x: value of exposure values to predict in
 #   - cen: centering value (for RR)
 #   - L: lag at which to calculate RR
 #   - at_inter: value of effect modifier (if interaction modifying type)
@@ -182,3 +182,4 @@ InterpretRR <- function(model,at_x, cen, L, at_inter = NULL, ref_inter = NULL){
     
     
 }
+
