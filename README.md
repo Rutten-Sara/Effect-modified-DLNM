@@ -11,7 +11,14 @@ Following datasets are necessary to run the code and are included in the data fo
 
 
 ## Rcode
-The main code covariate_varying_DLNM_Italy.R contains the Rcode of the data application. Moreover, the folder **simulations** includes the Rcode that can be used to recover the simulation results. This folder contains several files:
+The main code covariate_varying_DLNM_Italy.R contains the Rcode of the data application. // Moreover, the folder **simulations** includes the Rcode that can be used to recover the simulation results. This folder contains several files:
 | File | Description |
 | --- | --- | 
-
+| DLNM_Laplace_covariate.R | Function to fit the DLNM model with effect modification |
+| DLNM_Laplace_covariate_poisson.R | Function called by DLNM_Laplace_covariate.R (fit the DLNM model with poisson distribution) |
+| DLNM_Laplace_covariate_NB.R | Function called by DLNM_Laplace_covariate.R (fit the DLNM model with negative binomial distribution) |
+| predRR_covariate.R | Function to calculate the estimated RR |
+| interpret_coefficients.R | Function to calculate the RRR (relative risk ratio) |
+| help_functions | Functions called by DLNM_Laplace_covariate.R, predRR_covariate.R and interpret_coefficients.R |
+| af_Laplace.R | Calculate attributable fraction |
+| BAM_predict.R | Function to calculate the RR using the BAM/GAM package |
