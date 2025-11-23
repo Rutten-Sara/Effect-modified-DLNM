@@ -8,6 +8,7 @@ This repository contains the Rcodes used to generate the results from the paper 
 Following datasets are necessary to run the code and are included in the data folder:
 | Dataset | Description | Downloaded from |
 | --- | --- | --- |
+| daily_data.RData | Daily summer temperature in Barcelona | https://github.com/marcosqz/sbdlnm_smallarea_casestudy/tree/main/input
 
 
 ## Rcode
