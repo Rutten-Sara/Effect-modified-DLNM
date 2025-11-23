@@ -8,7 +8,13 @@ This repository contains the Rcodes used to generate the results from the paper 
 Following datasets are necessary to run the code and are included in the data folder:
 | Dataset | Description | Downloaded from |
 | --- | --- | --- |
-| daily_data.RData | Daily summer temperature in Barcelona | https://github.com/marcosqz/sbdlnm_smallarea_casestudy/tree/main/input
+| daily_data.RData | Daily summer temperature in Barcelona | https://github.com/marcosqz/sbdlnm_smallarea_casestudy/tree/main/input |
+| shapefile_bcn.shp | Shapefile Barcelona | https://github.com/marcosqz/sbdlnm_smallarea_casestudy/tree/main/input |
+| mortality.csv.gz | Mortality data Italy | https://github.com/gasparrini/RiskExtrapolation |
+| tmean.csv.gz | Average temperature data Italy | https://github.com/gasparrini/RiskExtrapolation |
+| metadata_age.csv.gz | Age data Italy | https://github.com/gasparrini/RiskExtrapolation |
+| metadata_spatial.csv.gz | Data on city-specific characteristics Italy | https://github.com/gasparrini/RiskExtrapolation |
+| italymap.shp | Shapefile Italy | https://github.com/gasparrini/RiskExtrapolation |
 
 
 ## Rcode
