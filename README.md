@@ -28,7 +28,7 @@ Moreover, the folder **simulations** includes the Rcode that can be used to reco
 | Smooth_large_area.R | Simulation code for smooth effect modification in large areas |
 | Additional Simulations | Similar code to obtain the results for the negative binomial simulations (Supplementary Materials) |
 
-The folder **functions** include the Rcode that is needed to fit the effect modified DLNM model. The folder contains the following files:
+The folder **functions** includes the Rcode that is needed to fit the effect modified DLNM model. The folder contains the following files:
 | File | Description |
 | --- | --- | 
 | DLNM_Laplace_covariate.R | Function to fit the DLNM model with effect modification |
