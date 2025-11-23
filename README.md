@@ -14,3 +14,4 @@ Following datasets are necessary to run the code and are included in the data fo
 The Rcode used in this paper is structured in several files:
 | File | Description |
 | --- | --- | 
+| covariate_varying_DLNM_Italy | Data application Italy |
