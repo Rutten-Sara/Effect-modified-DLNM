@@ -12,7 +12,7 @@
 #   - range: THE RANGE OF EXPOSURE. IF NULL, THE WHOLE RANGE IS USED
 #   - sim: IF SIMULATION SAMPLES SHOULD BE RETURNED. ONLY FOR tot=TRUE
 #   - nsim: NUMBER OF SIMULATION SAMPLES
-#   - group: GROUP ID (IF ID = NULL) TO CALCULATE LAGGED EFFECTS
+#   - group: GROUP ID TO CALCULATE LAGGED EFFECTS
 #   - ex.prob: CALULCATE EXCEEDANCE PROBABILITY OF 0?
 ################################################################################
 attrdl_Laplace <- function(x,model,cases, z = NULL, ID = NULL,
@@ -257,3 +257,4 @@ attrdl_Laplace <- function(x,model,cases, z = NULL, ID = NULL,
 }
 
 #
+
