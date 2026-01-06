@@ -5,7 +5,6 @@
 #   - cases: THE CASES VECTOR OR (ONLY FOR dir="forw") THE MATRIX OF FUTURE CASES
 #   - model: THE FITTED MODEL
 #   - ID: ID OF OBSERVATION (THAT MATCHES ID IN OUTCOME MODEL)
-#   - model.link: LINK FUNCTION IF model IS NOT PROVIDED
 #   - type: EITHER "an" OR "af" FOR ATTRIBUTABLE NUMBER OR FRACTION
 #   - dir: EITHER "back" OR "forw" FOR BACKWARD OR FORWARD PERSPECTIVES
 #   - tot: IF TRUE, THE TOTAL ATTRIBUTABLE RISK IS COMPUTED
@@ -256,4 +255,5 @@ attrdl_Laplace <- function(x,model,cases, z = NULL, ID = NULL,
   }
   return(res)
 }
+
 #
