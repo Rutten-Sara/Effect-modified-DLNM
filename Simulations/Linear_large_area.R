@@ -314,7 +314,7 @@ for (i in 1:nsim){
     interaction_matrix <- do.call(cbind, interaction_list)
     
     mtime <- proc.time()
-    mod_cts <- gnm(y_all ~ z_lin + crossbasis_unpen + interaction_matrix, 
+    mod_cts <- gnm(y_all ~ crossbasis_unpen + interaction_matrix, 
                    eliminate=stratum, data=data, family=poisson)
     time_CTS =  (proc.time()-mtime)[3]
     
@@ -900,6 +900,7 @@ ggplot(df_exposure_long, aes(x = x, y = exp(RR), group = row, color = row)) +
   theme_minimal() +
   ggtitle("Linear")
 dev.off()
+
 
 
 
