@@ -312,7 +312,7 @@ for (i in 1:nsim){
     interaction_matrix <- do.call(cbind, interaction_list)
     
     mtime <- proc.time()
-    mod_cts <- gnm(y_all ~ z_lin + crossbasis_unpen + interaction_matrix, 
+    mod_cts <- gnm(y_all ~ crossbasis_unpen + interaction_matrix, 
                    eliminate=stratum, data=data, family=nb(-1))
     time_CTS =  (proc.time()-mtime)[3]
     
@@ -849,4 +849,5 @@ which_fails/tot_sim
 time/tot_sim
 DIC_percentage/tot_sim
 AIC_percentage/tot_sim
+
 
