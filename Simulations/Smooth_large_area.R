@@ -307,26 +307,26 @@ for (i in 1:nsim){
     #########################################
     #               Fit CTS                 #
     #########################################
-    #tryCatch({
-    #  data$stratum = factor(data$region)
-    #  interaction_list <- lapply(seq_len(ncol(crossbasis_unpen)), function(j) {
-    #    z_lin * crossbasis_unpen[, j]
-    #  })
-    #  interaction_matrix <- do.call(cbind, interaction_list)
+    tryCatch({
+      data$stratum = factor(data$region)
+      interaction_list <- lapply(seq_len(ncol(crossbasis_unpen)), function(j) {
+        z_lin * crossbasis_unpen[, j]
+      })
+      interaction_matrix <- do.call(cbind, interaction_list)
       
-    #  mtime <- proc.time()
-    #  mod_cts <- gnm(y_all ~ z_lin + crossbasis_unpen + interaction_matrix, 
-    #                 eliminate=stratum, data=data, family=poisson)
-    #  time_CTS =  (proc.time()-mtime)[3]
+      mtime <- proc.time()
+      mod_cts <- gnm(y_all ~ z_lin + crossbasis_unpen + interaction_matrix, 
+                     eliminate=stratum, data=data, family=poisson)
+      time_CTS =  (proc.time()-mtime)[3]
       
-    #  ID_coef_cts = grepl("crossbasis_unpen|interaction_matrix", names(coef(mod_cts)))
-    #  selected_coefs_cts <- coef(mod_cts)[ID_coef_cts]
-    #  selected_var_cts  <- vcov(mod_cts)[ID_coef_cts, ID_coef_cts]
+      ID_coef_cts = grepl("crossbasis_unpen|interaction_matrix", names(coef(mod_cts)))
+      selected_coefs_cts <- coef(mod_cts)[ID_coef_cts]
+      selected_var_cts  <- vcov(mod_cts)[ID_coef_cts, ID_coef_cts]
       
-    #},error = function(e){
-    #  which_fails[10]<<- which_fails[10]+1
-    #  succes_flags <<- F
-    # cat("ERROR :",conditionMessage(e), "\n")})
+    },error = function(e){
+      which_fails[10]<<- which_fails[10]+1
+      succes_flags <<- F
+     cat("ERROR :",conditionMessage(e), "\n")})
     
     #########################################
     #         Fit Two-stage approach        #
@@ -573,41 +573,41 @@ for (i in 1:nsim){
     #########################################
     
     if(succes_flags){
-      # predvar_matrix_cts = predvar_matrix_cts_lower = predvar_matrix_cts_upper = NULL
-      #predall_matrix_cts_lower = predall_matrix_cts_upper = predall_matrix_cts =NULL
+      predvar_matrix_cts = predvar_matrix_cts_lower = predvar_matrix_cts_upper = NULL
+      predall_matrix_cts_lower = predall_matrix_cts_upper = predall_matrix_cts =NULL
       
-      #for(k in 1:dim(shapefile_bcn)[1]){
+      for(k in 1:dim(shapefile_bcn)[1]){
         
-      #  ID_z = which(data$region == unique(data$region)[k])[1]
-      #  at_z=z_lin[ID_z]
+        ID_z = which(data$region == unique(data$region)[k])[1]
+        at_z=z_lin[ID_z]
         
         
-      #  pred_all_cts = predRR_bam(selected_coefs_cts, selected_var_cts,crossbasis_unpen, at_x, cen = 5, L = 8, 
-      #                            at_inter = at_z, by = 1)
-      #  predvar_matrix_cts <- rbind(predvar_matrix_cts, pred_all_cts$logpredX)
-      #  predvar_matrix_cts_lower <- rbind(predvar_matrix_cts_lower, pred_all_cts$Qlower_logpredX)
-      #  predvar_matrix_cts_upper <- rbind(predvar_matrix_cts_upper, pred_all_cts$Qupper_logpredX)
+        pred_all_cts = predRR_bam(selected_coefs_cts, selected_var_cts,crossbasis_unpen, at_x, cen = 5, L = 8, 
+                                  at_inter = at_z, by = 1)
+        predvar_matrix_cts <- rbind(predvar_matrix_cts, pred_all_cts$logpredX)
+        predvar_matrix_cts_lower <- rbind(predvar_matrix_cts_lower, pred_all_cts$Qlower_logpredX)
+        predvar_matrix_cts_upper <- rbind(predvar_matrix_cts_upper, pred_all_cts$Qupper_logpredX)
         
-      #  predall_matrix[[10]][k,] <-  log(pred_all_cts$pred_all)
-      #  predall_matrix_cts_lower <- rbind(predall_matrix_cts_lower, log(pred_all_cts$Qlower_all))
-      #  predall_matrix_cts_upper <- rbind(predall_matrix_cts_upper, log(pred_all_cts$Qupper_all))
+        predall_matrix[[10]][k,] <-  log(pred_all_cts$pred_all)
+        predall_matrix_cts_lower <- rbind(predall_matrix_cts_lower, log(pred_all_cts$Qlower_all))
+        predall_matrix_cts_upper <- rbind(predall_matrix_cts_upper, log(pred_all_cts$Qupper_all))
         
-      #}
-      #cov_RR[[10]] = cov_RR[[10]] + (trueeff_sim_mat >= predvar_matrix_cts_lower &
-      #                                trueeff_sim_mat <= predvar_matrix_cts_upper)
-      #rmse_RR[[10]] = rmse_RR[[10]] + (trueeff_sim_mat - predvar_matrix_cts)^2
+      }
+      cov_RR[[10]] = cov_RR[[10]] + (trueeff_sim_mat >= predvar_matrix_cts_lower &
+                                      trueeff_sim_mat <= predvar_matrix_cts_upper)
+      rmse_RR[[10]] = rmse_RR[[10]] + (trueeff_sim_mat - predvar_matrix_cts)^2
       
-      #bias_RR[[10]] = bias_RR[[10]] + (trueeff_sim_mat - predvar_matrix_cts)
-      
-      
-      #cov_all[[10]]<- cov_all[[10]] + (trueeff_allsim_mat >= predall_matrix_cts_lower &
-      #                                   trueeff_allsim_mat <= predall_matrix_cts_upper)
-      #rmse_all[[10]] <- rmse_all[[10]] + (trueeff_allsim_mat - predall_matrix[[10]])^2
-      
-      #bias_all[[10]] <- bias_all[[10]] + (trueeff_allsim_mat - predall_matrix[[10]])
+      bias_RR[[10]] = bias_RR[[10]] + (trueeff_sim_mat - predvar_matrix_cts)
       
       
-      #time[10] = time[10] + time_CTS
+      cov_all[[10]]<- cov_all[[10]] + (trueeff_allsim_mat >= predall_matrix_cts_lower &
+                                         trueeff_allsim_mat <= predall_matrix_cts_upper)
+      rmse_all[[10]] <- rmse_all[[10]] + (trueeff_allsim_mat - predall_matrix[[10]])^2
+      
+      bias_all[[10]] <- bias_all[[10]] + (trueeff_allsim_mat - predall_matrix[[10]])
+      
+      
+      time[10] = time[10] + time_CTS
       
       #########################################
       #          Predict Two-stage            #
@@ -911,4 +911,5 @@ for (i in 1:nsim){
   
   
   
+
 
