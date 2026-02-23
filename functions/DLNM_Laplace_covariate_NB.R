@@ -7,6 +7,10 @@ DLNM_Laplace_cov_NB <- function(model,
                                 type = 'non_linear',
                                 df_inter = 5,
                                 df_z = 1,
+                                smooth = NULL,
+                                df_smooth = 10,
+                                smooth2 = NULL,
+                                df_smooth2 = 10,
                                 offset = NULL,
                                 z = NULL, 
                                 pen_crossbasis = NULL, DIC = T){
@@ -370,38 +374,107 @@ DLNM_Laplace_cov_NB <- function(model,
     
   }
   
+  logpv.smooth <- function(v) 0
+  
+  
+  
+  if(!is.null(smooth)){
+    smooth <- smooth[!is.na(crossbasis[,1])]
+    smooth_cov <- dlnm::ps(smooth, df = df_smooth, intercept = F)
+    
+    D_smooth = Matrix::t(Matrix::Matrix(attr(smooth_cov,"S")))+ Matrix::Diagonal(n = df_smooth, x = 1e-12)
+    X_smooth <- Matrix::Matrix(smooth_cov)
+    
+    
+    if(!is.null(smooth2)){
+      smooth2 <- smooth2[!is.na(crossbasis[,1])]
+      smooth2_cov <- dlnm::ps(smooth2, df = df_smooth2, intercept = F)
+      
+      D_smooth2 = Matrix::t(Matrix::Matrix(attr(smooth2_cov,"S")))+ Matrix::Diagonal(n = df_smooth2, x = 1e-12)
+      Pv_smooth <- function(v) as(Matrix::bdiag(exp(v[length(v)-1])*D_smooth,
+                                                exp(v[length(v)])*D_smooth2), "generalMatrix")
+      X_smooth <- Matrix::Matrix(cbind(X_smooth, Matrix::Matrix(smooth2_cov)), sparse = TRUE)
+      
+      
+      logpv.smooth <- function(v) 0.5 * nu * (v[length(v)]+v[length(v)-1])- 
+        (0.5*nu + a)*(log(b + 0.5*nu*exp(v[length(v)]+v[length(v)-1])))+ 
+        0.5*determinant_Pv(Pv_smooth(v))
+    }else{
+      
+      Pv_smooth <- function(v) exp(v[length(v)])*as(D_smooth, "generalMatrix")
+      
+      logpv.smooth <- function(v) 0.5 * nu * (v[length(v)])- 
+        (0.5*nu + a)*(log(b + 0.5*nu*exp(v[length(v)])))+ 
+        0.5*determinant_Pv(Pv_smooth(v))
+    }
+    
+    X <- Matrix::Matrix(cbind(X, X_smooth), sparse = TRUE) 
+  }
   
   
   #Precision matrix for parameter xi
-  if(type == "none" & is.null(covar.ri)){
-    Qv <- function(v){
-      result_matrix <- as(Matrix::bdiag(Matrix::Diagonal(n = dim(Z.linear)[2],
-                                                         x = zeta),
-                                        Pv1(v)), "generalMatrix")
-    }} else if (type == "none"& !is.null(covar.ri)){
-    Qv <- function(v){
-      result_matrix <- as(Matrix::bdiag(Matrix::Diagonal(n = dim(Z.linear)[2],
-                                                         x = zeta),
-                                        Pv1(v),
-                                        Gv(v)), "generalMatrix")
-    }}else if(is.null(covar.ri) ){
-    Qv <- function(v){
-      result_matrix <- as(Matrix::bdiag(Matrix::Diagonal(n = dim(Z.linear)[2],
-                                                         x = zeta),
-                                        Pv3(v),
-                                        Pv1(v),
-                                        Pv2(v)), "generalMatrix")
-    }} else{
+  if(is.null(smooth)){
+    if(type == "none" & is.null(covar.ri)){
       Qv <- function(v){
         result_matrix <- as(Matrix::bdiag(Matrix::Diagonal(n = dim(Z.linear)[2],
-                                                           x = zeta), 
-                                          Pv3(v),
-                                          Pv1(v),
-                                          Pv2(v),
-                                          Gv(v)), "generalMatrix")
-      }
-    }
-  
+                                                           x = zeta),
+                                          Pv1(v)), "generalMatrix")
+      }} else if (type == "none"& !is.null(covar.ri)){
+        Qv <- function(v){
+          result_matrix <- as(Matrix::bdiag(Matrix::Diagonal(n = dim(Z.linear)[2],
+                                                             x = zeta),
+                                            Pv1(v),
+                                            Gv(v)), "generalMatrix")
+        }}else if(is.null(covar.ri) ){
+          Qv <- function(v){
+            result_matrix <- as(Matrix::bdiag(Matrix::Diagonal(n = dim(Z.linear)[2],
+                                                               x = zeta),
+                                              Pv3(v),
+                                              Pv1(v),
+                                              Pv2(v)), "generalMatrix")
+          }} else{
+            Qv <- function(v){
+              result_matrix <- as(Matrix::bdiag(Matrix::Diagonal(n = dim(Z.linear)[2],
+                                                                 x = zeta), 
+                                                Pv3(v),
+                                                Pv1(v),
+                                                Pv2(v),
+                                                Gv(v)), "generalMatrix")
+            }
+          }
+    
+  }else{
+    if(type == "none" & is.null(covar.ri)){
+      Qv <- function(v){
+        result_matrix <- as(Matrix::bdiag(Matrix::Diagonal(n = dim(Z.linear)[2],
+                                                           x = zeta),
+                                          Pv1(v), Pv_smooth(v)), "generalMatrix")
+      }} else if (type == "none"& !is.null(covar.ri)){
+        Qv <- function(v){
+          result_matrix <- as(Matrix::bdiag(Matrix::Diagonal(n = dim(Z.linear)[2],
+                                                             x = zeta),
+                                            Pv1(v),
+                                            Gv(v), Pv_smooth(v)), "generalMatrix")
+        }}else if(is.null(covar.ri) ){
+          Qv <- function(v){
+            result_matrix <- as(Matrix::bdiag(Matrix::Diagonal(n = dim(Z.linear)[2],
+                                                               x = zeta),
+                                              Pv3(v),
+                                              Pv1(v),
+                                              Pv2(v), Pv_smooth(v)), "generalMatrix")
+          }} else{
+            Qv <- function(v){
+              result_matrix <- as(Matrix::bdiag(Matrix::Diagonal(n = dim(Z.linear)[2],
+                                                                 x = zeta), 
+                                                Pv3(v),
+                                                Pv1(v),
+                                                Pv2(v),
+                                                Gv(v), Pv_smooth(v)), "generalMatrix")
+            }
+          }
+    
+    
+  }
   
   # Negative binomial GLM with log-link
   Cv_xi <- function(xi, Xv){
@@ -516,6 +589,14 @@ DLNM_Laplace_cov_NB <- function(model,
     v_init = c(0,rep(2,pen_dlnm),v.rand)
   }
 
+  
+  if(!is.null(smooth)){
+    v_init <- c(v_init,5)
+    if(!is.null(smooth2)){
+      v_init <- c(v_init,2)
+    }
+  }
+  
   #if(approx == F){
   Qv_init <- Qv(v_init)
   # }else{
@@ -569,7 +650,7 @@ DLNM_Laplace_cov_NB <- function(model,
       #a5 <- (0.5 * nu) * vdisp - ((0.5 * nu) + a.disp) *  log(0.5*(nu * exp(vdisp)) + b.disp)
       a5 <- a.disp*vdisp - b.disp*exp(vdisp)
       
-      as.numeric(value <- a1+a2-a4+a5+logpv.fixed(v)+logpv.rand(v) + logpv.inter(v)+logpv.fixed_z(v))
+      as.numeric(value <- a1+a2-a4+a5+logpv.fixed(v)+logpv.rand(v) + logpv.smooth(v) + logpv.inter(v)+logpv.fixed_z(v))
     }, error = function(e) {
       -1e10  # penalize the optimizer
     })
@@ -628,16 +709,27 @@ DLNM_Laplace_cov_NB <- function(model,
 
 
   if(!is.null(covar.ri)){
-    if(covar.ri == "Convolution"){
-      str <- tail(xi_mode, 2*q.rand)[1:q.rand]
-      unstr <- tail(xi_mode, q.rand)
-      xispat <- (str + unstr) - mean(str + unstr)
-    } else {
-      xispat <- tail(xi_mode, q.rand) - mean(tail(xi_mode, q.rand))
-    } 
-  } else {
+    if(is.null(smooth)){
+      if(covar.ri == "Convolution"){
+        str <- tail(xi_mode, 2*q.rand)[1:q.rand]
+        unstr <- tail(xi_mode, q.rand)
+        xispat <- (str + unstr) - mean(str + unstr)
+      } else {
+        xispat <- tail(xi_mode, q.rand) - mean(tail(xi_mode, q.rand))
+      } 
+    }else{
+      if(covar.ri == "Convolution"){
+        str <- tail(xi_mode[1:(length(xi_mode)-dim(X_smooth)[2])], 2*q.rand)[1:q.rand]
+        unstr <- tail(xi_mode[1:(length(xi_mode)-dim(X_smooth)[2])], q.rand)
+        xispat <- (str + unstr) - mean(str + unstr)
+      } else {
+        xispat <- tail(xi_mode[1:(length(xi_mode)-dim(X_smooth)[2])], q.rand) - mean(tail(xi_mode[1:(length(xi_mode)-dim(X_smooth)[2])], q.rand))
+      } 
+    }
+  }else {
     xispat <- NULL
   }
+  
 
   
   

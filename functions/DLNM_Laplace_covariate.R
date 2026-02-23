@@ -16,6 +16,10 @@
 #   - pen_crossbasis: difference penalty order on crossbasis (if penalty)
 #   - DIC: calculate DIC criterium (true or false)
 #   - family: "poisson" or "NB"
+#   - smooth: Possible additional smooth variable (using P-splines)
+#   - df_smooth: degrees of freedom for additional smooth variable
+#   - smooth2: Second possible additional smooth variable (using P-splines)
+#   - df_smooth2: degrees of freedom for second additional smooth variable
 ################################################################################
 
 DLNM_Laplace_cov <- function(model,
@@ -29,7 +33,9 @@ DLNM_Laplace_cov <- function(model,
                              df_z = 1,
                              offset = NULL,
                              z = NULL,
-                             pen_crossbasis = 2, DIC = F, family = "poisson"){
+                             pen_crossbasis = 2, DIC = F, family = "poisson",
+                             smooth = NULL, df_smooth = 10, smooth2 = NULL,
+                             df_smooth2 = 10){
 
   
   if(family == "poisson"){
@@ -42,6 +48,10 @@ DLNM_Laplace_cov <- function(model,
                                type,
                                df_inter,
                                df_z,
+                               smooth,
+                               df_smooth,
+                               smooth2,
+                               df_smooth2,
                                offset ,
                                z, pen_crossbasis , DIC)
   }else if (family =="NB"){
@@ -54,6 +64,10 @@ DLNM_Laplace_cov <- function(model,
                                type,
                                df_inter,
                                df_z,
+                               smooth,
+                               df_smooth,
+                               smooth2,
+                               df_smooth2,
                                offset,
                                z, pen_crossbasis, DIC)
     
