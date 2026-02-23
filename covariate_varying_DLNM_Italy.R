@@ -1,6 +1,5 @@
 library(tidyverse) ; library(data.table); library(splines); library(dlnm); library(sf)
 
-setwd("G:/My Drive/Onderzoek/DLNM/Spatial varying DLNM/Code/Covariate varying")
 
 source('functions/DLNM_Laplace_covariate.R')
 source('functions/DLNM_Laplace_covariate_NB.R')
@@ -15,10 +14,10 @@ source('functions/af_Laplace.R')
 #---------------------------
 
 # Read mortality data
-mortdata <- fread("application/data/mortality.csv.gz")
+mortdata <- fread("data/mortality.csv.gz")
 
 # Read temperature series and merge
-tempdata <- fread("application/data/tmean.csv.gz")
+tempdata <- fread("data/tmean.csv.gz")
 tsdata <- merge(mortdata, tempdata, all.x = T)
 
 # Order
@@ -38,11 +37,11 @@ metadf <- expand.grid(agegroup = agelabs,
                       city_code = unique(tsdata$city_code))
 
 # Load data from EUcityTRM and merge
-metadata_spatial <- read.csv("application/data/metadata_spatial.csv.gz")
+metadata_spatial <- read.csv("data/metadata_spatial.csv.gz")
 metadf <- merge(metadf, metadata_spatial) 
 
 # Load age-specific demographic data
-metadata_age <- read.csv("application/data/metadata_age.csv.gz")
+metadata_age <- read.csv("data/metadata_age.csv.gz")
 
 
 
@@ -62,7 +61,7 @@ datafull[, ":="(year = lubridate::year(date), dow = weekdays(date))]
 ########################
 # Read map of Italy    #
 ########################
-italymap <- st_read("application/data/italymap.shp")
+italymap <- st_read("data/italymap.shp")
 cities_locations <- datafull%>%
   group_by(city_name) %>%
   summarize(lon = min(lon), lat = min(lat), depriv = min(depriv)) %>%
@@ -70,13 +69,12 @@ cities_locations <- datafull%>%
 
 cities_sf <- st_as_sf(cities_locations, coords = c("lon", "lat"), crs = 4326)
 
-pdf("application/Figures/map_Italy.pdf")
 ggplot() +
   geom_sf(data = italymap, fill = "antiquewhite", color = "black") +
   geom_sf(data = cities_sf, aes(color = depriv), size = 2) +
   theme_minimal() +
   labs(title = "Selected Cities in Italy")
-dev.off()
+
 
 
 ################################################################################
@@ -391,7 +389,6 @@ result_af <- data.frame(ID = unique(group_af), AF = est_af_fit, depriv = data202
 
 
 
-pdf("application/Figures/af_smooth.pdf", height = 16, width = 12)
 ggplot(result_af, aes(x = AF, y = ID)) +
   geom_errorbarh(aes(xmin = lower, xmax = upper, color = depriv), height = 0.2, size = 1) +
   geom_point(aes(color = depriv), size = 3) +
@@ -410,7 +407,6 @@ ggplot(result_af, aes(x = AF, y = ID)) +
   )
 
 
-dev.off()
 
 
 # Counterfactual scenarios
@@ -433,7 +429,6 @@ result_af_depriv <- data.frame(ID = unique(group_af), AF = est_af_fit_depriv,
 
 
 library(ggnewscale)
-pdf("application/Figures/af_smooth_counter.pdf", height = 16, width = 12)
 
 legend_df <- data.frame(
   type = c("True", "Counterfactual"),
@@ -479,26 +474,6 @@ ggplot(result_af, aes(x = AF, y = ID)) +
   ) +
   xlim (c(-0.02,0.11))
 
-dev.off()
-
-
-# Same temperature
-data2021 <- data2021 %>%
-  group_by(date) %>%
- mutate(quantile_common = mean(quantile_temp)) %>%
-  ungroup()
-est_af_temp = attrdl_Laplace(data2021$quantile_common,model_laplace_inter_quantile_NB,data2021$deaths, data2021$same_depriv,
-                               type="af",dir="back",tot=TRUE,cen = 0.6, sim=TRUE, nsim = 500, ID=group_af) 
-
-est_af_fit_temp = attrdl_Laplace(x = data2021$quantile_common,model = model_laplace_inter_quantile_NB,cases = data2021$deaths, z = data2021$same_depriv,
-                                   type="af",dir="back",tot=TRUE,cen = 0.6, sim=FALSE, ID=group_af) 
-
-result_af_temp <- data.frame(ID = unique(group_af), est = est_af_fit_temp,
-                               lower = apply(est_af_temp,1,quantile, probs = 0.025),
-                               upper = apply(est_af_temp,1,quantile, probs = 0.975)) %>%
-  arrange(est) %>%
-  mutate(ID = factor(ID, levels = ID))
-
 
 
 
@@ -523,7 +498,6 @@ pred3_quantile = predRR(model_laplace_inter_quantile_NB, at_x_quantile, cen = 0.
 
 col <- c("darkgoldenrod3", "aquamarine3", "darkred")
 
-pdf("application/Figures/RR_by_cov_smooth.pdf", width = 6, height = 6)
 parold <- par(no.readonly=T)
 par(mar=c(4,4,1,0.5), las=1, mgp=c(2.5,1,0))
 # Plot gam
@@ -559,7 +533,7 @@ fci(x=at_x_quantile , high = pred2_quantile$Qupper_all,
 plot.arg3 <- list(type = "l",col=col[3],  lwd=1.5)
 fci(x=at_x_quantile , high = pred1_quantile$Qupper_all,
     low = pred1_quantile$Qlower_all, ci.arg=list(col=alpha(col[3], 0.2)), plot.arg = plot.arg3)
-dev.off()
+
 
 
 z_pred = seq(quantile(datafull$dpv_scaled,0.025), quantile(datafull$dpv_scaled,0.975), length = 100)
@@ -576,7 +550,7 @@ for(pred_i in 1:length(z_pred)){
 
 # RR versus deprivation for different temperature quantiles
 
-pdf("application/Figures/RR_by_temp_smooth.pdf", width = 6, height = 6)
+
 col <- c("darkgoldenrod3", "aquamarine3", "darkred")
 parold <- par(no.readonly=T)
 par(mar=c(4,4,1,0.5), las=1, mgp=c(2.5,1,0))
@@ -614,7 +588,7 @@ fci(x=z_pred*z_sd+z_mean  , high = by.z_upper_quantile[2,],
 plot.arg3 <- list(type = "l",col=col[3],  lwd=1.5)
 fci(x=z_pred*z_sd+z_mean  , high = by.z_upper_quantile[1,],
     low = by.z_lower_quantile[1,], ci.arg=list(col=alpha(col[3], 0.2)), plot.arg = plot.arg3)
-dev.off()
+
 
 
 # Lag specific relationship for different deprivation quantiles
@@ -626,7 +600,7 @@ pred3_quantile_lag = predRR(model_laplace_inter_quantile_NB, 0.95, cen = 0.6, L 
 
 col <- c("darkgoldenrod3", "aquamarine3", "darkred")
 
-pdf("application/Figures/RR_by_lag_smooth.pdf", width = 6, height = 6)
+
 parold <- par(no.readonly=T)
 par(mar=c(4,4,1,0.5), las=1, mgp=c(2.5,1,0))
 # Plot gam
@@ -656,42 +630,7 @@ fci(x=0:21 , high = exp(pred2_quantile_lag$Qupper_logpredX),
 plot.arg3 <- list(type = "l",col=col[3],  lwd=1.5)
 fci(x=0:21 , high = exp(pred1_quantile_lag$Qupper_logpredX),
     low = exp(pred1_quantile_lag$Qlower_logpredX), ci.arg=list(col=alpha(col[3], 0.2)), plot.arg = plot.arg3)
-dev.off()
 
-
-
-# Overall RR for all areas
-ind_area = 1
-pred_overall_area = lower_overall_area = upper_overall_area = matrix(0, nrow = length(at_x_quantile), # unique(datafull$dpv_scaled)
-                                                                     ncol = length(as.numeric(quantile(datafull$dpv_scaled, probs = c(0.05,0.25,0.5,0.75,0.95)))))
-for(pred_i in as.numeric(quantile(datafull$dpv_scaled, probs = c(0.05,0.25,0.5,0.75,0.95)))){ # unique(datafull$dpv_scaled)
-  pred_all_area = predRR(model_laplace_inter_quantile_NB, at_x_quantile, 0.6,L,at_inter = pred_i)
-  pred_overall_area[,ind_area] = pred_all_area$pred_all
-  lower_overall_area[,ind_area] = pred_all_area$Qlower_all
-  upper_overall_area[,ind_area] = pred_all_area$Qupper_all
-  
-  ind_area = ind_area+1
-}
-
-
-df_plot_area <- as.data.frame(pred_overall_area) %>%
-  mutate(at_x = at_x_quantile) %>%
-  pivot_longer(cols = -at_x,
-               names_to = "variable",
-               values_to = "RR") %>%
-  mutate(depriv = rep(as.numeric(quantile(datafull$dpv_scaled, 
-                                          probs = c(0.05,0.25,0.5,0.75,0.95))),100)*z_sd+z_mean) # rep(unique(datafull$depriv),100)
-
-pdf("application/Figures/all_area_selection.pdf", width = 6, height = 4)
-ggplot(df_plot_area, aes(x = at_x, y = RR, group = variable, col = depriv)) +
-  geom_line()+
-  theme_minimal() +
-  scale_color_gradientn(colors = c("#bdbdbd", "#ef3b2c", "#99000d"))  +
-  labs(
-    x = "Temperature percentile",
-    y = "RR"
-  )
-dev.off()
 
 
 # Grid of temperature and deprivation
@@ -718,12 +657,6 @@ df_plot_smooth_quantile <- expand.grid(at_x = at_x_quantile, z = z_pred*z_sd+z_m
 
 # Heat map
 
-ggplot(df_plot_smooth_quantile, aes(x = at_x, y = z, fill = RR)) + # %>% mutate(RR = ifelse(RR>2.5,2.5,RR))
-  geom_tile() +
-  scale_fill_viridis_c() +
-  theme_minimal()  +
-  labs(x = "Temperature percentile", y = "Deprivation", fill = "RR")
-
 
 heat_map1 <- ggplot(df_plot_smooth_quantile  %>% filter(at_x < 0.25), aes(x = at_x, y = z, fill = RR)) + # %>% mutate(RR = ifelse(RR>2.5,2.5,RR))
   geom_tile() +
@@ -738,37 +671,14 @@ heat_map2 <- ggplot(df_plot_smooth_quantile  %>% filter(at_x > 0.75), aes(x = at
   labs(x = "Temperature percentile", y = "Deprivation", fill = "RR")
 
 library(gridExtra)
-pdf("application/Figures/contour_smooth.pdf", width = 6, height = 4)
+
 grid.arrange(heat_map1, heat_map2, ncol = 2)
-dev.off()
 
-# Interactive plot with slider for continuous z
-fig_quantile <- plot_ly(
-  df_plot_smooth_quantile,
-  x = ~at_x,
-  y = ~RR,
-  frame = ~z,
-  type = 'scatter',
-  mode = 'lines',
-  name = "RR"
-) %>%
-  add_ribbons(ymin = ~lower, ymax = ~upper, line = list(color = 'transparent'),
-              fillcolor = 'rgba(0,100,80,0.2)', name = "95% CI")%>%
-  layout(
-    title = "RR vs temperature",
-    xaxis = list(title = "temperature percentile"),
-    yaxis = list(title = "RR")
-  ) %>%
-  animation_opts(frame = 0, redraw = TRUE) %>%
-  animation_slider(currentvalue = list(prefix = "Deprivation = "))
 
-fig_quantile
-
-htmlwidgets::saveWidget(fig_quantile, "application/Figures/smooth_RR.html", selfcontained = TRUE)
 
 
 # 3D plot
-pdf("application/Figures/RR_3d_smooth.pdf", height = 6, width = 6)
+
 plot_ly(
   x = ~z_pred*z_sd+z_mean,       
   y = ~at_x_quantile,    
@@ -783,7 +693,7 @@ plot_ly(
       zaxis = list(title = "RR")
     )
   )
-dev.off()
+
 
 
 # Red zone
@@ -805,23 +715,23 @@ df_plot_smooth_heat <- expand.grid(at_x = at_x_quantile, z = z_pred*z_sd+z_mean)
 df_plot_smooth_heat_low <- df_plot_smooth_heat %>% filter(at_x < 0.25)
 df_plot_smooth_heat_high <- df_plot_smooth_heat %>% filter(at_x > 0.75)
 
-pdf("application/Figures/exceedance_low_smooth.pdf", height = 4, width = 6)
+
 ggplot(df_plot_smooth_heat_low, aes(x = at_x, y = z, fill = exc)) + # %>% mutate(RR = ifelse(RR>2.5,2.5,RR))
   geom_tile() +
   geom_hline(aes(yintercept=quantile(datafull$depriv,0.5)), linetype = "dashed")+
   scale_fill_gradient(low = "mistyrose", high = "darkred")+
   theme_minimal() +
   labs(x = "Temperature percentile", y = "Deprivation", fill = "exceedance")
-dev.off()
 
-pdf("application/Figures/exceedance_high_smooth.pdf", height = 4, width = 6)
+
+
 ggplot(df_plot_smooth_heat_high, aes(x = at_x, y = z, fill = exc)) + # %>% mutate(RR = ifelse(RR>2.5,2.5,RR))
   geom_tile() +
   geom_hline(aes(yintercept=quantile(datafull$depriv,0.5)), linetype = "dashed")+
   scale_fill_gradient(low = "mistyrose", high = "darkred")+
   theme_minimal() +
   labs(x = "Temperature percentile", y = "Deprivation", fill = "exceedance")
-dev.off()
+
 
 
 
@@ -829,13 +739,13 @@ dev.off()
 cities_locations$random_effect = model_laplace_inter_quantile_NB$xispat
 cities_sf <- st_as_sf(cities_locations, coords = c("lon", "lat"), crs = 4326)
 
-pdf("application/Figures/map_Italy_re.pdf")
+
 ggplot() +
   geom_sf(data = italymap, fill = "antiquewhite", color = "black") +
   geom_sf(data = cities_sf, aes(color = random_effect), size = 2) +
   theme_minimal() +
   labs(title = "Random effect of selected Cities in Italy")
-dev.off()
+
 
 
 
@@ -863,7 +773,7 @@ df_plot_RRR <- expand.grid(at_x = at_x_quantile_RRR, z = z_pred_RRR*z_sd+z_mean)
   ) %>%
   arrange(z)
 
-pdf("application/Figures/RRR.pdf", height = 4, width = 6)
+
 ggplot(df_plot_RRR, aes(x = at_x, y = RRR)) +
   geom_errorbar(aes(ymin = lower_RRR, ymax = upper_RRR), width = 0.01, size = 0.5) +
   geom_point(size = 3) +
@@ -879,5 +789,5 @@ ggplot(df_plot_RRR, aes(x = at_x, y = RRR)) +
     axis.text = element_text(size = 14) 
   )
 
-dev.off()
+
 
