@@ -23,10 +23,12 @@ Moreover, the folder **simulations** includes the Rcode that can be used to reco
 | File | Description |
 | --- | --- | 
 | Linear_small_area.R | Simulation code for linear effect modification in small areas |
+| Linear_medium_area.R | Simulation code for linear effect modification in medium areas |
 | Linear_large_area.R | Simulation code for linear effect modification in large areas |
 | Smooth_small_area.R | Simulation code for smooth effect modification in small areas |
+| Smooth_medium_area.R | Simulation code for smooth effect modification in medium areas |
 | Smooth_large_area.R | Simulation code for smooth effect modification in large areas |
-| Additional Simulations | Similar code to obtain the results for the negative binomial simulations (Supplementary Materials) |
+| Additional Simulations | Similar code to obtain the results for the negative binomial and spatial misspecification simulations (Supplementary Materials) |
 
 The folder **functions** includes the Rcode that is needed to fit the effect modified DLNM model. The folder contains the following files:
 | File | Description |
